@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Shortened URLs</title>
+    <script type="text/javascript" charset="utf-8" src="/_utils/script/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        //<![CDATA[
+        $(function($) {
+            var domainParts = window.location.href.split('//');
+            var domain = domainParts[1].split('/')[0];
+            var domainNoPort = domain.split(':')[0];
+            var localhost = false;
+            if(domainNoPort === 'localhost' || domainNoPort === '127.0.0.1') {
+                localhost = true;
+            }
+            var protocol = domainParts[0];
+            var base_url = protocol + '//' + domain;
+            $('.local').each(function() {
+                var obj = $(this);
+                obj.html(base_url + obj.html());
+                obj.attr({
+                    href: '/urls/_design/shortener/_show/long' + obj.attr('href')
+                });
+            });
+        });
+        //]]>
+    </script>
+</head>
+<body>
+    <ul>

@@ -1,0 +1,40 @@
+Started life based on janl's io http://github.com/janl/io Other than some very 
+basic structual similarities, this is a complete rewrite.
+
+To install:
+couchapp push url-shortener http://127.0.0.1:5984/urls
+
+Create a short url:
+
+curl -X POST http://127.0.0.1:5984/urls/_design/shortener/_update/shorten?target=http://zombo.com/
+
+You should see:
+
+  Shortened to ~17w
+
+If you try to shorten the same url again, you should see a document conflict, 
+since a shortened url already exists for that domain:
+{"error":"conflict","reason":"Document update conflict."}
+
+Get the redirect:
+
+http://127.0.0.1:5984/urls/_design/shortener/_show/long/~17w
+
+Example config running behind an Nginx reverse proxy:
+
+location /~ {
+    rewrite ^(.*)$ /urls/_design/shortener/_show/long$1 break;    
+    proxy_pass http://127.0.0.1:5984;
+}
+
+For a list of shortened urls in the database see:
+http://127.0.0.1:5984/urls/_design/shortener/_list/index/shorts
+
+The main page for the app is:
+http://127.0.0.1:5984/urls/_design/shortener/index.html
+
+There is a chance for collisions with this model. The shortener simply adds the 
+url length and the character codes for each character in the url. A base36 
+string of the sum is returned. I'm not sure of the statistal chances of 
+collision are using this method, but they certainly can't be worse than the 
+random string method used in io.
