@@ -10,7 +10,7 @@ curl -X POST http://127.0.0.1:5984/urls/_design/shortener/_update/shorten?target
 
 You should see:
 
-  Shortened to ~17w
+  Shortened to ~439tppb
 
 If you try to shorten the same url again, you should see a document conflict, 
 since a shortened url already exists for that domain:
@@ -18,7 +18,7 @@ since a shortened url already exists for that domain:
 
 Get the redirect:
 
-http://127.0.0.1:5984/urls/_design/shortener/_show/long/~17w
+http://127.0.0.1:5984/urls/_design/shortener/_show/long/~439tppb
 
 Example config running behind an Nginx reverse proxy:
 
@@ -33,8 +33,8 @@ http://127.0.0.1:5984/urls/_design/shortener/_list/index/shorts
 The main page for the app is:
 http://127.0.0.1:5984/urls/_design/shortener/index.html
 
-There is a chance for collisions with this model. The shortener simply adds the 
-url length and the character codes for each character in the url. A base36 
-string of the sum is returned. I'm not sure of the statistal chances of 
-collision are using this method, but they certainly can't be worse than the 
-random string method used in io.
+The shorten method uses a basic crc-32 checksum on a base64 encoded url, then 
+returns a base36 string of the checksum. I ran a test on ~700,000 urls I 
+downloaded from a blacklist site (probably the only good use for censorship). 
+There is approximately 1 conflict per 10,000 urls. Most of the collisions 
+occured with ranges of similar ip only urls.
